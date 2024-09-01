@@ -121,6 +121,7 @@
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            overflow: hidden; /* Add this to prevent content from overflowing */
         }
 
         .note:hover {
@@ -132,11 +133,20 @@
             color: var(--primary-color);
             margin-bottom: 10px;
             font-size: 1.1em;
+            word-wrap: break-word; /* Add this to wrap long titles */
         }
 
         .note p {
             margin-bottom: 15px;
             color: #666;
+            word-wrap: break-word; /* Add this to wrap long content */
+            white-space: pre-wrap; /* Preserve line breaks and wrap text */
+        }
+
+        /* Add these styles for better text containment */
+        .note-content {
+            max-height: 150px;
+            overflow-y: auto;
         }
 
         #fileViewer {
@@ -263,7 +273,7 @@
                 reader.onload = function(e) {
                     const note = {
                         title,
-                        content,
+                        content: formatContent(content),
                         attachedFile: e.target.result,
                         fileName: attachedFile.name,
                         fileType: attachedFile.type
@@ -276,7 +286,7 @@
             } else {
                 const note = {
                     title,
-                    content,
+                    content: formatContent(content),
                     attachedFile: null,
                     fileName: null,
                     fileType: null
@@ -292,6 +302,10 @@
             fileInput.value = '';
         }
 
+        function formatContent(content) {
+            return content.replace(/(.{34})/g, "$1\n").trim();
+        }
+
         function saveNotesToLocalStorage() {
             localStorage.setItem('stickyNotes', JSON.stringify(notes));
         }
@@ -305,7 +319,9 @@
                 noteElement.classList.add('note');
                 noteElement.innerHTML = `
                     <h4>${note.title}</h4>
-                    <p>${note.content}</p>
+                    <div class="note-content">
+                        <p>${note.content.replace(/\n/g, '<br>')}</p>
+                    </div>
                     ${note.attachedFile ? `<button onclick="openFile(${index})">View ${note.fileName}</button>` : ''}
                     <button class="edit-button" onclick="editNote(${index})">Edit</button>
                     <button class="delete-button" onclick="deleteNote(${index})">Delete</button>
@@ -335,7 +351,7 @@
             const newTitle = document.getElementById(`editTitle${index}`).value;
             const newContent = document.getElementById(`editContent${index}`).value;
             notes[index].title = newTitle;
-            notes[index].content = newContent;
+            notes[index].content = formatContent(newContent);
             saveNotesToLocalStorage();
             displayNotes();
         }
@@ -364,7 +380,9 @@
                     noteElement.classList.add('note');
                     noteElement.innerHTML = `
                         <h4>${note.title}</h4>
-                        <p>${note.content}</p>
+                        <div class="note-content">
+                            <p>${note.content.replace(/\n/g, '<br>')}</p>
+                        </div>
                         ${note.attachedFile ? `<button onclick="openFile(${notes.indexOf(note)})">View ${note.fileName}</button>` : ''}
                         <button class="edit-button" onclick="editNote(${notes.indexOf(note)})">Edit</button>
                         <button class="delete-button" onclick="deleteNote(${notes.indexOf(note)})">Delete</button>
