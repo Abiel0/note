@@ -1,154 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sticky Notes</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Sticky Notes App</title>
     <style>
-        :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f39c12;
-            --background-color: #f4f4f4;
-            --note-color: #ffffff;
-            --text-color: #333333;
-        }
-
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #1a1a1a;
+            color: #fff;
         }
-
-        body {
-            font-family: 'Poppins', Arial, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 20px;
         }
-
         h1 {
             text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 40px;
+            color: #ffd700;
             font-size: 2.5em;
-            font-weight: 600;
-        }
-
-        .add-note, .search {
-            background-color: var(--note-color);
-            border-radius: 10px;
-            padding: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
         }
-
-        .add-note:hover, .search:hover {
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        .input-container {
+            margin-bottom: 20px;
         }
-
-        h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        input[type="text"],
-        textarea {
+        input[type="text"], textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ffd700;
             border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
+            background-color: #2a2a2a;
+            color: #fff;
         }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
         button {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: #ffd700;
+            color: #1a1a1a;
+            padding: 10px 20px;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 14px;
-            font-weight: 600;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
-
         button:hover {
-            background-color: #3a7ac8;
+            background-color: #fff;
+            color: #1a1a1a;
+            transform: scale(1.05);
         }
-
-        .delete-button {
-            background-color: #e74c3c;
-        }
-
-        .delete-button:hover {
-            background-color: #c0392b;
-        }
-
-        .edit-button {
-            background-color: var(--secondary-color);
-        }
-
-        .edit-button:hover {
-            background-color: #e67e22;
-        }
-
         #notesContainer {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
         }
-
         .note {
             background-color: var(--note-color);
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            overflow: hidden; /* Add this to prevent content from overflowing */
+            overflow: hidden;
         }
-
         .note:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
-
         .note h4 {
             color: var(--primary-color);
             margin-bottom: 10px;
             font-size: 1.1em;
-            word-wrap: break-word; /* Add this to wrap long titles */
+            word-wrap: break-word;
         }
-
         .note p {
             margin-bottom: 15px;
             color: #666;
-            word-wrap: break-word; /* Add this to wrap long content */
-            white-space: pre-wrap; /* Preserve line breaks and wrap text */
+            word-wrap: break-word;
+            white-space: pre-wrap;
         }
-
-        /* Add these styles for better text containment */
         .note-content {
             max-height: 150px;
             overflow-y: auto;
         }
-
+        .edit-button, .delete-button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        #searchInput {
+            width: 100%;
+            margin-bottom: 20px;
+        }
         #fileViewer {
             position: fixed;
             top: 0;
@@ -159,7 +100,6 @@
             display: none;
             z-index: 1000;
         }
-
         #fileViewerContent {
             width: 100%;
             height: 100%;
@@ -168,7 +108,6 @@
             display: flex;
             flex-direction: column;
         }
-
         #fileViewerToolbar {
             display: flex;
             justify-content: space-between;
@@ -177,7 +116,6 @@
             background-color: #f1f1f1;
             border-bottom: 1px solid #ddd;
         }
-
         #fileViewerToolbar button {
             background-color: #f1f1f1;
             border: none;
@@ -185,80 +123,241 @@
             cursor: pointer;
             font-size: 14px;
         }
-
         #fileViewerToolbar button:hover {
             background-color: #ddd;
         }
-
         #fileViewerMain {
             flex: 1;
             overflow: auto;
             padding: 20px;
         }
-
         #fileViewerMain img {
             max-width: 100%;
             height: auto;
         }
-
         #fileViewerMain pre {
             white-space: pre-wrap;
             word-wrap: break-word;
         }
-
         #fileViewerMain iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 10px;
-            }
-
-            #notesContainer {
-                grid-template-columns: 1fr;
-            }
+        #zoomControls {
+            margin-top: 10px;
         }
+        #noteCount {
+            text-align: right;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        #premiumOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        #premiumContent {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        #premiumContent h2 {
+            color: #ffd700;
+            margin-top: 0;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        #premiumContent p {
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        #closePremiumOverlay {
+            background-color: #8f66ff;
+            color: #1a1a1a;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        #closePremiumOverlay:hover {
+            background-color: #fff;
+            color: #1a1a1a;
+            transform: scale(1.05);
+        }
+        .premium-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .premium-button {
+            background: #8f66ff;
+           
+        }
+        #p{
+            color: #78ff8e;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
     </style>
 </head>
 <body>
+    <div class="premium-info">
+        <p id="p">Premium pack user</p>
+        <a href="newt09wft3"><button class="premium-button">Premium users</button></a>
+    </div>
     <div class="container">
-        <h1>Sticky Notes</h1>
-
-        <div class="add-note">
-            <h3>Add a New Note</h3>
-            <input type="text" id="noteTitle" placeholder="Title">
-            <textarea id="noteContent" placeholder="Write your note here"></textarea>
-            <input type="file" id="fileInput">
+        <h1>Sticky Notes App</h1>
+        <div class="input-container">
+            <input type="text" id="noteTitle" placeholder="Enter note title">
+            <textarea id="noteContent" placeholder="Enter note content"></textarea>
+            <input type="file" id="fileInput" style="display:none;">
+            <button onclick="document.getElementById('fileInput').click()" id="click">Attach File</button>
             <button onclick="addNote()">Add Note</button>
         </div>
-
-        <div class="search">
-            <h3>Search Notes</h3>
-            <input type="text" id="searchInput" placeholder="Search by title">
-            <button onclick="searchNotes()">Search</button>
-        </div>
-
-        <div id="notesContainer"></div>
+        <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="searchNotes()">
+        <div id="noteCount">Notes: 12/10</div>
+        <div id="notesContainer"><div class="note">
+                    <h4>abiel</h4>
+                    <div class="note-content">
+                        <p>Last year, I was sitting in the gr<br>een room of a literary festival wi<br>th an international group of write<br>rs, enjoying the good company and <br>free wine, when one of them decide<br>d we all really needed to know abo<br>ut two very famous, very gorgeous <br>– and also very married – writers <br>who had recently had a secret affa<br>ir. Apparently, the man had gone a<br>round boasting about it, unbeknown<br> to his female lover, I’m sure. Oh<br>, what a cad. It was a bonding mom<br>ent for all of us as we gasped at <br>this priceless gem of gossip landi<br>ng in our laps.<br><br>I admit that I’ve always loved fin<br>ding out about illicit affairs and<br> sexual trysts – people’s hidden l<br>ives, hidden stories. But who does<br>n’t like a good gossip? Sure, I’ve<br> known a few sanctimonious souls i<br>n my time who’ll feign disapproval<br> at such scurrilous behaviour, but<br> the rest of us mere mortals scurr<br>y around scavenging for morsels of<br> information, salivating when we c<br>ome across something juicy. It’s u<br>nfair that gossip gets a bad press<br> when it’s really a kind of data-s<br>haring interaction, isn’t it? (Isn<br>’t it?) And a healthy sign of curi<br>osity about the lives of others, a<br>s opposed to being self-obsessed. <br>And in spite of the naysayers, who<br> can honestly hold their hands up <br>and say they’ve never talked about<br> other people behind their backs?<br><br>Admittedly, there’s a fine line be<br>tween harmless gossip and bitching<br>, and I’ve dropped a couple of mat<br>es over the years because they tur<br>ned into pathological character as<br>sassinators. When you’re hanging w<br>ith people like that, it not only <br>gets boring, but you are also, as <br>a listener, somehow made complicit<br>.</p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(0)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(0)">Delete</button>
+                </div><div class="note">
+                    <h4>f</h4>
+                    <div class="note-content">
+                        <p>ff</p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(1)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(1)">Delete</button>
+                </div><div class="note">
+                    <h4>d</h4>
+                    <div class="note-content">
+                        <p>ddd</p>
+                    </div>
+                    <button onclick="openFile(2)">View anishprint.pdf</button>
+                    <button class="edit-button" onclick="editNote(2)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(2)">Delete</button>
+                </div><div class="note">
+                    <h4>dd</h4>
+                    <div class="note-content">
+                        <p>dd</p>
+                    </div>
+                    <button onclick="openFile(3)">View ANISH Latest Cv.pdf</button>
+                    <button class="edit-button" onclick="editNote(3)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(3)">Delete</button>
+                </div><div class="note">
+                    <h4>s</h4>
+                    <div class="note-content">
+                        <p></p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(4)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(4)">Delete</button>
+                </div><div class="note">
+                    <h4>s</h4>
+                    <div class="note-content">
+                        <p></p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(5)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(5)">Delete</button>
+                </div><div class="note">
+                    <h4>luke</h4>
+                    <div class="note-content">
+                        <p>jesus apostle</p>
+                    </div>
+                    <button onclick="openFile(6)">View lukewjesus.jpeg</button>
+                    <button class="edit-button" onclick="editNote(6)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(6)">Delete</button>
+                </div><div class="note">
+                    <h4>f</h4>
+                    <div class="note-content">
+                        <p></p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(7)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(7)">Delete</button>
+                </div><div class="note">
+                    <h4>dd</h4>
+                    <div class="note-content">
+                        <p>dd</p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(8)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(8)">Delete</button>
+                </div><div class="note">
+                    <h4>ee</h4>
+                    <div class="note-content">
+                        <p>dd</p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(9)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(9)">Delete</button>
+                </div><div class="note">
+                    <h4>ff</h4>
+                    <div class="note-content">
+                        <p>ff</p>
+                    </div>
+                    
+                    <button class="edit-button" onclick="editNote(10)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(10)">Delete</button>
+                </div><div class="note">
+                    <h4>ff</h4>
+                    <div class="note-content">
+                        <p>ff</p>
+                    </div>
+                    <button onclick="openFile(11)">View ai-generated-image (8).png</button>
+                    <button class="edit-button" onclick="editNote(11)">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(11)">Delete</button>
+                </div></div>
     </div>
 
     <div id="fileViewer">
         <div id="fileViewerContent">
-            <div id="fileViewerToolbar">
-                <div>
-                    <button onclick="zoomIn()">+</button>
-                    <button onclick="zoomOut()">-</button>
-                    <span id="pageInfo"></span>
-                </div>
-                <button onclick="closeFileViewer()">Close</button>
-            </div>
+            <button id="closeButton" onclick="closeFileViewer()">Close</button>
             <div id="fileViewerMain"></div>
+            <div id="zoomControls">
+                <button onclick="zoomIn()">Zoom In</button>
+                <button onclick="zoomOut()">Zoom Out</button>
+                <span id="pageInfo"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="premiumOverlay">
+        <div id="premiumContent">
+            <h2>Unlock Premium Features</h2>
+            <p>To write more than 10 notes, upgrade to our new premium plan and enjoy unlimited note-taking!</p>
+            <a href="https://buy.stripe.com/28o2ccdsbbKh6mA8ww"><button id="closePremiumOverlay" onclick="closePremiumOverlay()">Upgrade </button> </a>
         </div>
     </div>
 
     <script>
+        const MAX_NOTES = 10;
         const storedNotes = JSON.parse(localStorage.getItem('stickyNotes')) || [];
         const notes = [...storedNotes];
 
@@ -267,6 +366,12 @@
             const content = document.getElementById('noteContent').value;
             const fileInput = document.getElementById('fileInput');
             const attachedFile = fileInput.files[0];
+            
+
+            if (notes.length >= MAX_NOTES) {
+                showPremiumOverlay();
+                return;
+            }
 
             if (attachedFile) {
                 const reader = new FileReader();
@@ -328,6 +433,10 @@
                 `;
                 notesContainer.appendChild(noteElement);
             });
+
+            // Update note count display
+            const noteCountElement = document.getElementById('noteCount');
+            noteCountElement.textContent = `Notes: ${notes.length}/${MAX_NOTES}`;
         }
 
         function deleteNote(index) {
@@ -362,7 +471,10 @@
 
         function searchNotes() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filteredNotes = notes.filter(note => note.title.toLowerCase().includes(searchTerm));
+            const filteredNotes = notes.filter(note => 
+                note.title.toLowerCase().includes(searchTerm) || 
+                note.content.toLowerCase().includes(searchTerm)
+            );
             displayFilteredNotes(filteredNotes);
         }
 
@@ -450,8 +562,19 @@
             pageInfo.textContent = `Zoom: ${Math.round(currentScale * 100)}%`;
         }
 
+        function showPremiumOverlay() {
+            const premiumOverlay = document.getElementById('premiumOverlay');
+            premiumOverlay.style.display = 'flex';
+        }
+
+        function closePremiumOverlay() {
+            const premiumOverlay = document.getElementById('premiumOverlay');
+            premiumOverlay.style.display = 'none';
+        }
+
         // Display notes on page load
         displayNotes();
     </script>
+
 </body>
 </html>
