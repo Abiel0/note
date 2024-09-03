@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ffd700;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+            color: #fff;
+        }
+        button {
+            background-color: #ffd700;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #fff;
+            color: #1a1a1a;
+            transform: scale(1.05);
+        }
+        #notesContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .note {
+            background-color: var(--note-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .note:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .note h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            word-wrap: break-word;
+        }
+        .note p {
+            margin-bottom: 15px;
+            color: #666;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        .note-content {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .edit-button, .delete-button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        #searchInput {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #fileViewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 1000;
+        }
+        #fileViewerContent {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #fileViewerToolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+        #fileViewerToolbar button {
+            background-color: #f1f1f1;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #fileViewerToolbar button:hover {
+            background-color: #ddd;
+        }
+        #fileViewerMain {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+        #fileViewerMain img {
+            max-width: 100%;
+            height: auto;
+        }
+        #fileViewerMain pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #fileViewerMain iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #zoomControls {
+            margin-top: 10px;
+        }
+        #noteCount {
+            text-align: right;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        #fileInput {
+            display: none;
+        }
+        #passwordScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        #passwordForm {
+            background-color: #2a2a2a;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        #passwordForm h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        #passwordForm input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ffd700;
+            border-radius: 5px;
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+        #passwordForm button {
+            background-color: #ffd700;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        #passwordForm button:hover {
+            background-color: #fff;
+            color: #1a1a1a;
+            transform: scale(1.05);
+        }
+        .premium-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            color: #ffd700;
+        }
+        .premium-info p {
+            margin-right: 10px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            z-index: 2001;
+        }
+        .popup-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+        }
+        .copy-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background-color: #ffd700;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+        .back-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background-color: #ffd700;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        footer {
+            background-color: #2a2a2a;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .buttonpop {
+            background-color: #8f66ff;
+        }
+    </style>
+</head>
+<body>
+    <div id="passwordScreen">
+        <div class="premium-info">
+            <p>If you don't have the premium plan</p>
+            <a href="https://buy.stripe.com/28o2ccdsbbKh6mA8ww" ><button onclick="showPasswordForm()" class="buttonpop">Continue</button></a>
+        </div>
+        <div id="passwordForm">
+            <h2>Enter Password</h2>
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <button onclick="checkPassword()">Submit</button>
+            
+            
+        </div>
+            <footer>
+                <p>If you don't know your password check email or contact 07852891770 OR</p>
+                <a href="https://buy.stripe.com/28o2ccdsbbKh6mA8ww" ><button onclick="showPasswordForm()" class="buttonpop">BUY PREMIUM</button></a>
+
+            </footer>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p>If you don't know your password check email or contact 07852891770</p>
+            <button class="copy-btn" onclick="copyContact()">Copy</button>
+            <button class="back-btn" onclick="closePopup()">Back</button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="container">
+        <h1>Sticky Notes App</h1>
+        <div class="input-container">
+            <input type="text" id="noteTitle" placeholder="Enter note title">
+            <textarea id="noteContent" placeholder="Enter note content"></textarea>
+            <input type="file" id="fileInput" style="display:none;">
+            <button onclick="document.getElementById('fileInput').click()">Attach File</button>
+            <button onclick="addNote()">Add Note</button>
+        </div>
+        <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="searchNotes()">
+        <div id="noteCount"></div>
+        <div id="notesContainer"></div>
+    </div>
+
+    <div id="fileViewer">
+        <div id="fileViewerContent">
+            <button id="closeButton" onclick="closeFileViewer()">Close</button>
+            <div id="fileViewerMain"></div>
+            <div id="zoomControls">
+                <button onclick="zoomIn()">Zoom In</button>
+                <button onclick="zoomOut()">Zoom Out</button>
+                <span id="pageInfo"></span>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <script>
+        const correctPassword = "jeabi098w";
+        let isAuthenticated = false;
+
+        function checkPassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput.value === correctPassword) {
+                isAuthenticated = true;
+                document.getElementById('passwordScreen').style.display = 'none';
+                displayNotes();
+            } else {
+                showPopup();
+                passwordInput.value = '';
+            }
+        }
+
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function copyContact() {
+            const contactNumber = '07852891770';
+            navigator.clipboard.writeText(contactNumber).then(() => {
+                alert('Contact number copied to clipboard!');
+            });
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('overlay').addEventListener('click', function() {
+            closePopup();
+        });
+
+        const storedNotes = JSON.parse(localStorage.getItem('stickyNotes')) || [];
+        const notes = [...storedNotes];
+
+        function addNote() {
+            if (!isAuthenticated) return;
+
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+            const fileInput = document.getElementById('fileInput');
+            const attachedFile = fileInput.files[0];
+
+            if (attachedFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const note = {
+                        title,
+                        content: formatContent(content),
+                        attachedFile: e.target.result,
+                        fileName: attachedFile.name,
+                        fileType: attachedFile.type
+                    };
+                    notes.push(note);
+                    saveNotesToLocalStorage();
+                    displayNotes();
+                };
+                reader.readAsDataURL(attachedFile);
+            } else {
+                const note = {
+                    title,
+                    content: formatContent(content),
+                    attachedFile: null,
+                    fileName: null,
+                    fileType: null
+                };
+                notes.push(note);
+                saveNotesToLocalStorage();
+                displayNotes();
+            }
+
+            // Clear input fields
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            fileInput.value = '';
+        }
+
+        function formatContent(content) {
+            return content.replace(/(.{34})/g, "$1\n").trim();
+        }
+
+        function saveNotesToLocalStorage() {
+            localStorage.setItem('stickyNotes', JSON.stringify(notes));
+        }
+
+        function displayNotes() {
+            if (!isAuthenticated) return;
+
+            const notesContainer = document.getElementById('notesContainer');
+            notesContainer.innerHTML = '';
+
+            notes.forEach((note, index) => {
+                const noteElement = document.createElement('div');
+                noteElement.classList.add('note');
+                noteElement.innerHTML = `
+                    <h4>${note.title}</h4>
+                    <div class="note-content">
+                        <p>${note.content.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    ${note.attachedFile ? `<button onclick="openFile(${index})">View ${note.fileName}</button>` : ''}
+                    <button class="edit-button" onclick="editNote(${index})">Edit</button>
+                    <button class="delete-button" onclick="deleteNote(${index})">Delete</button>
+                `;
+                notesContainer.appendChild(noteElement);
+            });
+
+            // Update note count display
+            const noteCountElement = document.getElementById('noteCount');
+            noteCountElement.textContent = `Notes: ${notes.length}`;
+        }
+
+        function deleteNote(index) {
+            if (!isAuthenticated) return;
+
+            notes.splice(index, 1);
+            saveNotesToLocalStorage();
+            displayNotes();
+        }
+
+        function editNote(index) {
+            if (!isAuthenticated) return;
+
+            const note = notes[index];
+            const noteElement = document.querySelector(`#notesContainer .note:nth-child(${index + 1})`);
+            noteElement.innerHTML = `
+                <input type="text" id="editTitle${index}" value="${note.title}">
+                <textarea id="editContent${index}">${note.content}</textarea>
+                <button onclick="saveEdit(${index})">Save</button>
+                <button onclick="cancelEdit(${index})">Cancel</button>
+            `;
+        }
+
+        function saveEdit(index) {
+            if (!isAuthenticated) return;
+
+            const newTitle = document.getElementById(`editTitle${index}`).value;
+            const newContent = document.getElementById(`editContent${index}`).value;
+            notes[index].title = newTitle;
+            notes[index].content = formatContent(newContent);
+            saveNotesToLocalStorage();
+            displayNotes();
+        }
+
+        function cancelEdit(index) {
+            if (!isAuthenticated) return;
+
+            displayNotes();
+        }
+
+        function searchNotes() {
+            if (!isAuthenticated) return;
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredNotes = notes.filter(note => 
+                note.title.toLowerCase().includes(searchTerm) || 
+                note.content.toLowerCase().includes(searchTerm)
+            );
+            displayFilteredNotes(filteredNotes);
+        }
+
+        function displayFilteredNotes(filteredNotes) {
+            if (!isAuthenticated) return;
+
+            const notesContainer = document.getElementById('notesContainer');
+            notesContainer.innerHTML = '';
+
+            if (filteredNotes.length === 0) {
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.textContent = 'No results found.';
+                notesContainer.appendChild(noResultsDiv);
+            } else {
+                filteredNotes.forEach((note, index) => {
+                    const noteElement = document.createElement('div');
+                    noteElement.classList.add('note');
+                    noteElement.innerHTML = `
+                        <h4>${note.title}</h4>
+                        <div class="note-content">
+                            <p>${note.content.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        ${note.attachedFile ? `<button onclick="openFile(${notes.indexOf(note)})">View ${note.fileName}</button>` : ''}
+                        <button class="edit-button" onclick="editNote(${notes.indexOf(note)})">Edit</button>
+                        <button class="delete-button" onclick="deleteNote(${notes.indexOf(note)})">Delete</button>
+                    `;
+                    notesContainer.appendChild(noteElement);
+                });
+            }
+        }
+
+        function openFile(index) {
+            if (!isAuthenticated) return;
+
+            const note = notes[index];
+            if (note.attachedFile) {
+                const fileViewer = document.getElementById('fileViewer');
+                const fileViewerMain = document.getElementById('fileViewerMain');
+                fileViewerMain.innerHTML = '';
+
+                if (note.fileType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = note.attachedFile;
+                    fileViewerMain.appendChild(img);
+                } else if (note.fileType === 'application/pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = note.attachedFile;
+                    fileViewerMain.appendChild(iframe);
+                } else if (note.fileType.startsWith('text/')) {
+                    const pre = document.createElement('pre');
+                    pre.textContent = atob(note.attachedFile.split(',')[1]);
+                    fileViewerMain.appendChild(pre);
+                } else {
+                    const link = document.createElement('a');
+                    link.href = note.attachedFile;
+                    link.download = note.fileName;
+                    link.textContent = `Download ${note.fileName}`;
+                    fileViewerMain.appendChild(link);
+                }
+
+                fileViewer.style.display = 'block';
+                updatePageInfo();
+            }
+        }
+
+        function closeFileViewer() {
+            if (!isAuthenticated) return;
+
+            const fileViewer = document.getElementById('fileViewer');
+            fileViewer.style.display = 'none';
+        }
+
+        function zoomIn() {
+            if (!isAuthenticated) return;
+
+            const fileViewerMain = document.getElementById('fileViewerMain');
+            const currentScale = fileViewerMain.style.transform ? parseFloat(fileViewerMain.style.transform.replace('scale(', '').replace(')', '')) : 1;
+            fileViewerMain.style.transform = `scale(${currentScale + 0.1})`;
+            updatePageInfo();
+        }
+
+        function zoomOut() {
+            if (!isAuthenticated) return;
+
+            const fileViewerMain = document.getElementById('fileViewerMain');
+            const currentScale = fileViewerMain.style.transform ? parseFloat(fileViewerMain.style.transform.replace('scale(', '').replace(')', '')) : 1;
+            fileViewerMain.style.transform = `scale(${Math.max(0.1, currentScale - 0.1)})`;
+            updatePageInfo();
+        }
+
+        function updatePageInfo() {
+            if (!isAuthenticated) return;
+
+            const pageInfo = document.getElementById('pageInfo');
+            const fileViewerMain = document.getElementById('fileViewerMain');
+            const currentScale = fileViewerMain.style.transform ? parseFloat(fileViewerMain.style.transform.replace('scale(', '').replace(')', '')) : 1;
+            pageInfo.textContent = `Zoom: ${Math.round(currentScale * 100)}%`;
+        }
+
+        // Don't display notes on page load, wait for authentication
+        // displayNotes();
+    </script>
+
+</body></html>

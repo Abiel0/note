@@ -1,0 +1,121 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Premium Unlock</title>
+    <style>
+        :root {
+            --primary-color: #ffd700;
+            --background-color: #1a1a1a;
+            --text-color: #ffffff;
+            --button-hover-color: #ffea00;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            margin: 2rem auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .password-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .password-box:hover {
+            transform: scale(1.05);
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .password-box {
+                padding: 1rem;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Don't leave until you copy both</h1>
+        
+        <div class="password-box">
+            <p>Password to unlock premium: jeabi098w</p>
+            <button class="btn" onclick="copyPassword('jeabi098w')">Copy</button>
+        </div>
+
+        <div class="password-box">
+            <p>Your unique link to acess premium</p>
+            <a href="newt09wft3.html"><button class="btn">Go to</button></a>
+        </div>
+    </div>
+
+    <script>
+        function copyPassword(password) {
+            navigator.clipboard.writeText(password).then(() => {
+                alert('Password copied to clipboard!');
+            });
+        }
+    </script>
+
+</body>
+</html>
